@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeSpace - AI-Assisted Real-Time Collaborative Coding Platform</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <style>
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            max-width: 900px;
+            margin: 24px auto 0;
+            text-align: left;
+        }
+        .feature-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 18px;
+        }
+        .feature-card h3 { margin: 0 0 6px; font-size: 15px; }
+        .feature-card p { margin: 0; font-size: 13px; opacity: 0.8; }
+        .hero-note a { color: #58a6ff; }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="brand">VibeSpace</div>
+        <nav class="nav-links">
+            <a href="https://github.com/rushikeshgajananshinde993-lab/VibeSpace">Source Code</a>
+        </nav>
+    </header>
+
+    <main class="hero">
+        <h1 class="hero-title">VibeSpace</h1>
+        <p class="hero-tagline">AI-Assisted Real-Time Collaborative Coding Platform</p>
+        <p class="hero-text">
+            Code together in real time. Chat, run, review and keep every version -
+            all in one portable web application.
+        </p>
+        <div class="hero-actions">
+            <a class="btn" href="https://vibespace.onrender.com/login">Login</a>
+            <a class="btn btn-outline" href="https://vibespace.onrender.com/register">Create Account</a>
+        </div>
+        <div class="hero-actions">
+            <span class="badge">Portable</span>
+            <span class="badge">Offline-ready</span>
+            <span class="badge">AI-assisted</span>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card"><h3>Real-time collaboration</h3><p>Live text sync, presence and remote cursors (Socket.IO).</p></div>
+            <div class="feature-card"><h3>Code runner</h3><p>HTML/CSS/JS preview, Python, Java and C# execution.</p></div>
+            <div class="feature-card"><h3>Offline AI analysis</h3><p>Rule-based code review: bugs, security, quality, complexity, performance.</p></div>
+            <div class="feature-card"><h3>Shareable rooms</h3><p>Create a room and invite friends with a single link.</p></div>
+            <div class="feature-card"><h3>Version history</h3><p>Save, compare and restore any version of your code.</p></div>
+            <div class="feature-card"><h3>Admin dashboard</h3><p>Users, rooms and platform statistics.</p></div>
+        </div>
+        <p class="hero-note">
+            Version 1.0.0 &mdash; View source on
+            <a href="https://github.com/rushikeshgajananshinde993-lab/VibeSpace">GitHub</a>.
+            The live app runs from the URL in the buttons above.
+        </p>
+    </main>
+
+    <footer class="footer">
+        <p>VibeSpace - Final Year B.Sc. IT Project</p>
+    </footer>
+</body>
+</html>
