@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor - {{ room.name }} | {{ app_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/editor.css') }}">
+    <style>
+        .monaco-editor-container { height: 100%; }
+        #editor-host { position: absolute; inset: 0; }
+    </style>
+</head>
+<body class="editor-body">
+    <!-- Top toolbar -->
+    <header class="editor-toolbar">
+        <div class="e-logo">
+            <a href="{{ url_for('dashboard') }}">{{ app_name }}</a>
+            <span class="e-sep">/</span>
+            <span class="e-room-name">{{ room.name }}</span>
+            <code class="e-code" id="room-code">{{ room.room_code }}</code>
+            <button class="btn btn-xs btn-outline" id="copy-link-btn" title="Copy share link">Copy link</button>
+        </div>
+
+        <div class="e-controls">
+
+            <select id="language-select" title="Language">
+                {% for lang in languages %}
+                <option value="{{ lang.id }}" {% if lang.id == initial_language %}selected{% endif %}>
+                    {{ lang.label }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <select id="template-select" title="Smart templates">
+                <option value="">Template...</option>
+                {% for lang in languages %}
+                <option value="{{ lang.id }}">{{ lang.label }} template</option>
+                {% endfor %}
+            </select>
+
+            <button class="btn btn-xs" id="run-btn" title="Run code">Run</button>
+            <button class="btn btn-xs btn-outline" id="analyze-btn" title="AI code watch">AI</button>
+            <a class="btn btn-xs btn-outline" id="review-btn" href="{{ url_for('review', room_id=room.id) }}" title="Full review report">Review</a>
+            <button class="btn btn-xs btn-outline" id="save-version-btn" title="Save a version">Save v</button>
+            <button class="btn btn-xs btn-outline" id="versions-btn" title="Version history">Versions</button>
+        </div>
+
+        <div class="e-user">
+            <span class="user-chip">{{ user.username }}{% if user.role == 'admin' %} (admin){% endif %}</span>
+            <span class="online-count" id="online-count">1 online</span>
+            <a class="btn btn-xs btn-outline" href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </header>
+
+    <!-- Main work area -->
+    <div class="editor-work">
+        <!-- Left: editor + output -->
+        <div class="editor-main">
+            <div id="editor-host"></div>
+
+            <div class="output-panel" id="output-panel">
+                <div class="output-tabs">
+                    <button class="otab active" data-tab="console">Console</button>
+                    <button class="otab" data-tab="preview">Preview</button>
+                    <button class="otab" data-tab="ai">AI Code Watch</button>
+                    <span class="otab-right">
+                        <button class="btn btn-xs btn-outline" id="clear-output-btn">Clear</button>
+                    </span>
+                </div>
+                <div class="output-body">
+                    <pre id="console-output" class="output-view active"></pre>
+                    <iframe id="preview-frame" class="output-view"></iframe>
+                    <div id="ai-output" class="output-view"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: collaborators + chat -->
+        <div class="right-panel">
+            <div class="collab-box">
+                <div class="panel-head" onclick="togglePanel(this)">
+                    <span>Collaborators (<span id="members-count">0</span>)</span>
+                    <button class="min-btn">−</button>
+                </div>
+                <div class="panel-body" id="members-list"></div>
+            </div>
+
+            <div class="chat-box">
+                <div class="panel-head" onclick="togglePanel(this)">
+                    <span>General Chat</span>
+                    <button class="min-btn">−</button>
+                </div>
+                <div class="panel-body chat-body">
+                    <div class="chat-messages" id="chat-general"></div>
+                    <form class="chat-form" onsubmit="sendChat('general', this); return false;">
+                        <input type="text" placeholder="Message..." autocomplete="off">
+                        <button type="submit" class="btn btn-xs">Send</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="chat-box">
+                <div class="panel-head" onclick="togglePanel(this)">
+                    <span>Code Context Chat</span>
+                    <button class="min-btn">−</button>
+                </div>
+                <div class="panel-body chat-body">
+                    <div class="chat-messages" id="chat-code"></div>
+                    <form class="chat-form" onsubmit="sendChat('code', this); return false;">
+                        <input type="text" placeholder="Discuss code, share snippets..." autocomplete="off">
+                        <button type="submit" class="btn btn-xs">Send</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="chat-box">
+                <div class="panel-head" onclick="togglePanel(this)">
+                    <span>Media / Photos</span>
+                    <button class="min-btn">−</button>
+                </div>
+                <div class="panel-body chat-body">
+                    <div class="chat-messages" id="chat-media"></div>
+                    <div class="chat-form">
+                        <input type="file" id="media-upload" accept="image/*" style="display:none">
+                        <button class="btn btn-xs" onclick="document.getElementById('media-upload').click()">Send photo</button>
+                        <button class="btn btn-xs btn-outline" onclick="sendChat('media_text', prompt('Image caption (optional):') || 'Uploaded a photo'); return false;">Caption</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Version history modal -->
+    <div class="modal" id="versions-modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-head">
+                <h3>Version History</h3>
+                <button class="btn btn-xs" onclick="document.getElementById('versions-modal').style.display='none'">Close</button>
+            </div>
+            <div class="modal-body" id="versions-list"></div>
+            <div class="modal-body" id="version-diff" style="display:none;">
+                <h4>Comparing versions</h4>
+                <pre id="diff-text"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+
+    <!-- Socket.IO client (bundled locally for offline use) -->
+    <script src="{{ url_for('static', filename='js/socket.io.min.js') }}"></script>
+    <!-- Monaco (local, offline) -->
+    <script src="{{ url_for('static', filename='monaco/vs/loader.js') }}"></script>
+
+    <script>
+        // ---------------------------------------------------------------
+        // Global app state (shared by collaboration.js / runner.js / ai.js)
+        // ---------------------------------------------------------------
+        window.APP = {
+            roomCode: {{ room.room_code|tojson }},
+            roomId: {{ room.id|tojson }},
+            roomName: {{ room.name|tojson }},
+            user: {{ {'id': user.id, 'username': user.username, 'role': user.role}|tojson }},
+            language: {{ initial_language|tojson }},
+            versions: {{ versions|tojson }},
+            initialCode: {{ initial_code|tojson }}
+        };
+        window.ROOM_ID = {{ room.id|tojson }};
+    </script>
+
+    <script src="{{ url_for('static', filename='js/editor.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/collaboration.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/runner.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ai.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - {{ app_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="navbar">
+        <div class="brand">{{ app_name }}</div>
+        <nav class="nav-links">
+            <span style="color:var(--muted);">Logged in as <strong>{{ user.username }}</strong>
+                {% if user.role == 'admin' %}(admin){% endif %}</span>
+            {% if user.role == 'admin' %}
+            <a href="{{ url_for('admin') }}">Admin</a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </header>
+
+    <main style="max-width: 980px; margin: 30px auto; padding: 0 20px;">
+
+        {% if error %}
+        <div class="alert alert-error">{{ error }}</div>
+        {% endif %}
+
+        <div class="grid grid-2" style="margin-bottom: 26px;">
+            <div class="card">
+                <h3>Create a coding room</h3>
+                <p style="color:var(--muted); margin-bottom:14px;">
+                    Get a room code and a share link, then invite friends.
+                </p>
+                <form method="POST" action="{{ url_for('room_create') }}">
+                    <div class="form-group">
+                        <label for="room-name">Room name (optional)</label>
+                        <input type="text" id="room-name" name="name" placeholder="e.g. Team Project">
+                    </div>
+                    <button type="submit" class="btn">Create Room</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3>Join a room</h3>
+                <p style="color:var(--muted); margin-bottom:14px;">
+                    Enter a room code that a friend shared with you.
+                </p>
+                <form method="GET" action="{{ url_for('join_room_page') }}">
+                    <div class="form-group">
+                        <label for="room-code">Room code</label>
+                        <input type="text" id="room-code" name="code" placeholder="e.g. ABC123"
+                               style="text-transform:uppercase;" required>
+                    </div>
+                    <button type="submit" class="btn">Join Room</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 26px;">
+            <h3>My Rooms</h3>
+            {% if my_rooms %}
+            <table style="width:100%; border-collapse:collapse;">
+                <tr style="color:var(--muted); text-align:left;">
+                    <th style="padding:8px;">Name</th>
+                    <th>Room Code</th>
+                    <th>Created</th>
+                    <th>Open</th>
+                </tr>
+                {% for room in my_rooms %}
+                <tr style="border-top:1px solid var(--border);">
+                    <td style="padding:8px;">{{ room.name }}</td>
+                    <td><code>{{ room.room_code }}</code></td>
+                    <td style="color:var(--muted);">{{ room.created_at }}</td>
+                    <td><a class="btn btn-sm" href="{{ url_for('editor', room_code=room.room_code) }}">Open</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <p style="color:var(--muted);">No rooms yet. Create one above!</p>
+            {% endif %}
+        </div>
+
+        {% if all_rooms %}
+        <div class="card">
+            <h3>Recent Rooms</h3>
+            <table style="width:100%; border-collapse:collapse;">
+                <tr style="color:var(--muted); text-align:left;">
+                    <th style="padding:8px;">Name</th>
+                    <th>Room Code</th>
+                    <th>Owner</th>
+                    <th>Open</th>
+                </tr>
+                {% for room in all_rooms %}
+                <tr style="border-top:1px solid var(--border);">
+                    <td style="padding:8px;">{{ room.name }}</td>
+                    <td><code>{{ room.room_code }}</code></td>
+                    <td style="color:var(--muted);">{{ room.owner_name or '-' }}</td>
+                    <td><a class="btn btn-sm btn-outline" href="{{ url_for('editor', room_code=room.room_code) }}">Open</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+
+        <div class="card" style="margin-top:26px;">
+            <h3>Code runners on this computer</h3>
+            <p>
+                Python: <strong>{{ tool_status.python }}</strong> |
+                Java/JDK: <strong>{{ tool_status.java }}</strong> |
+                .NET (C#): <strong>{{ tool_status.dotnet }}</strong>
+            </p>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <p>{{ app_name }} - Final Year B.Sc. IT Project</p>
+    </footer>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

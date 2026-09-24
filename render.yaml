@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: vibespace
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    healthCheckPath: /health
+    envVars:
+      - key: HOST
+        value: "0.0.0.0"
+      - key: PYTHON_VERSION
+        value: "3.12.10"

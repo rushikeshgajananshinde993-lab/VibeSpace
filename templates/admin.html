@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - {{ app_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="navbar">
+        <div class="brand">{{ app_name }}</div>
+        <nav class="nav-links">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </nav>
+    </header>
+
+    <main style="max-width: 980px; margin: 26px auto; padding: 0 20px;">
+        <h1>Admin Panel</h1>
+        <p style="color:var(--muted);">
+            Database file: <code>{{ db_path }}</code>
+        </p>
+
+        <!-- Stats -->
+        <div class="grid grid-2" style="margin: 20px 0;">
+            <div class="card"><h3>Total Users</h3><p style="font-size:2rem; color:var(--primary);">{{ stats.users }}</p></div>
+            <div class="card"><h3>Total Rooms</h3><p style="font-size:2rem; color:var(--primary);">{{ stats.rooms }}</p></div>
+            <div class="card"><h3>Total Messages</h3><p style="font-size:2rem; color:var(--primary);">{{ stats.messages }}</p></div>
+            <div class="card"><h3>Total Versions</h3><p style="font-size:2rem; color:var(--primary);">{{ stats.versions }}</p></div>
+        </div>
+
+        <!-- Users -->
+        <div class="card" style="margin-bottom: 24px;">
+            <h3>Users (passwords are stored as secure hashes - never shown)</h3>
+            {% if users %}
+            <table style="width:100%; border-collapse:collapse;">
+                <tr style="color:var(--muted); text-align:left;">
+                    <th style="padding:8px;">ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Registered</th>
+                </tr>
+                {% for u in users %}
+                <tr style="border-top:1px solid var(--border);">
+                    <td style="padding:8px;">{{ u.id }}</td>
+                    <td>{{ u.username }} {% if u.role == 'admin' %}<span class="badge">admin</span>{% endif %}</td>
+                    <td style="color:var(--muted);">{{ u.email }}</td>
+                    <td>{{ u.role }}</td>
+                    <td style="color:var(--muted);">{{ u.created_at }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <p style="color:var(--muted);">No users registered yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Rooms -->
+        <div class="card">
+            <h3>Rooms</h3>
+            {% if rooms %}
+            <table style="width:100%; border-collapse:collapse;">
+                <tr style="color:var(--muted); text-align:left;">
+                    <th style="padding:8px;">ID</th>
+                    <th>Room Code</th>
+                    <th>Name</th>
+                    <th>Owner</th>
+                    <th>Created</th>
+                </tr>
+                {% for r in rooms %}
+                <tr style="border-top:1px solid var(--border);">
+                    <td style="padding:8px;">{{ r.id }}</td>
+                    <td><code>{{ r.room_code }}</code></td>
+                    <td>{{ r.name }}</td>
+                    <td style="color:var(--muted);">{{ r.owner_name or '-' }}</td>
+                    <td style="color:var(--muted);">{{ r.created_at }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <p style="color:var(--muted);">No rooms created yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Runtimes -->
+        <div class="card" style="margin-top:24px;">
+            <h3>Code runner tools on this computer</h3>
+            <p>Python: <strong>{{ tool_status.python }}</strong> |
+               Java/JDK: <strong>{{ tool_status.java }}</strong> |
+               .NET (C#): <strong>{{ tool_status.dotnet }}</strong></p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>{{ app_name }} - Final Year B.Sc. IT Project | Admin Panel</p>
+    </footer>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
