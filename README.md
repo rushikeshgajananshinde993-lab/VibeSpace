@@ -27,7 +27,19 @@ history and offline AI-assisted code analysis in one application.
 
 ---
 
-## How to run
+## Run it online (free, no payment) - GitHub Codespaces
+
+[![Open in GitHub Codespaces](https://img.shields.io/badge/Open%20in%20Codespaces-181717?style=for-the-badge&logo=github&logoColor=white)](https://codespaces.new/rushikeshgajananshinde993-lab/VibeSpace)
+
+1. Click the button above (or open the repo, click `Code` -> `Codespaces` -> `Create codespace`).
+2. Wait for the setup to finish (2-3 min, automatic).
+3. Open the forwarded **port 5566** link (it shows in the bottom-right "Remote/Ports" tab, or VS Code opens a notification).
+   The public link looks like: `https://5566-<codespace>.app.github.dev/`
+4. Share that link! Anyone can register, log in, create rooms and code together.
+
+> Free on GitHub: 120 core-hours / month. The codespace pauses after ~30 min idle; clicking back in it wakes it up.
+
+## How to run (locally / pendrive)
 
 ### Option A - Pendrive (recommended)
 1. Insert pendrive
